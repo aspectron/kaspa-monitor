@@ -1,0 +1,57 @@
+[package]
+name = "kaspa-monitor-daemon"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Sparkle Indexer Daemon for Kaspa BlockDAG"
+
+[[bin]]
+name = "monitor"
+path = "src/main.rs"
+
+[features]
+default = []
+
+[build-dependencies]
+vergen = { version = "8.2.6", features = ["build", "git", "gitcl", "rustc", "cargo"] }
+
+[dependencies]
+kaspa-monitor-core.workspace = true
+kaspa-monitor-nexus.workspace = true
+# sparkle-database.workspace = true
+# sparkle-http-server.workspace = true
+kaspa-monitor-rpc-core.workspace = true
+kaspa-monitor-rpc-server.workspace = true
+
+# kaspa-addresses.workspace = true
+# kaspa-bip32.workspace = true
+# kaspa-consensus-core.workspace = true
+# kaspa-hashes.workspace = true
+# kaspa-notify.workspace = true
+# kaspa-rpc-core.workspace = true
+kaspa-utils.workspace = true
+# kaspa-wallet-core.workspace = true
+# kaspa-wallet-keys.workspace = true
+# kaspa-wrpc-client.workspace = true
+
+workflow-core.workspace = true
+workflow-http.workspace = true
+workflow-log.workspace = true
+workflow-wasm.workspace = true
+workflow-rpc.workspace = true
+
+cfg-if.workspace = true
+futures.workspace = true
+futures-util.workspace = true
+js-sys.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde-wasm-bindgen.workspace = true
+serde_with.workspace = true
+thiserror.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio.workspace = true
+clap.workspace = true

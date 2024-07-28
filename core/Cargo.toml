@@ -1,0 +1,65 @@
+[package]
+name = "kaspa-monitor-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Kaspa Monitor Core Data Structures"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+# kaspa-addresses.workspace = true
+# kaspa-bip32.workspace = true
+kaspa-consensus-core.workspace = true
+# kaspa-consensus-client.workspace = true
+# kaspa-notify.workspace = true
+kaspa-rpc-core.workspace = true
+# kaspa-utils.workspace = true
+# kaspa-wallet-core.workspace = true
+# kaspa-wallet-keys.workspace = true
+# kaspa-wrpc-client.workspace = true
+kaspa-hashes.workspace = true
+kaspa-metrics-core.workspace = true
+# kaspa-txscript-errors.workspace = true
+# kaspa-txscript.workspace = true
+
+workflow-core.workspace = true
+workflow-http.workspace = true
+workflow-log.workspace = true
+workflow-wasm.workspace = true
+workflow-rpc.workspace = true
+workflow-serializer.workspace = true
+
+async-trait.workspace = true
+cfg-if.workspace = true
+borsh.workspace = true
+ahash.workspace = true
+sha2.workspace = true
+faster-hex.workspace = true
+downcast-rs.workspace = true
+rand.workspace = true
+bs58.workspace = true
+futures-util.workspace = true
+futures.workspace = true
+js-sys.workspace = true
+qrcode.workspace = true
+serde_json.workspace = true
+serde_with.workspace = true
+serde-wasm-bindgen.workspace = true
+secp256k1.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+wasm-bindgen-futures.workspace = true
+wasm-bindgen.workspace = true
+web-sys.workspace = true
+
+# [target.'cfg(target_arch = "wasm32")'.dependencies]
+# kaspa-wasm.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+ctrlc.workspace = true
+tokio.workspace = true
+

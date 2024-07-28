@@ -1,0 +1,16 @@
+/core/resources/i18n/*
+/core/resources/fonts/*
+/target
+/macros/target
+/dist
+/dist-chrome
+/dist-firefox
+.DS_Store
+datadir
+/ipc/target
+/discard
+analyzer-target
+.vscode/launch.json
+kaspa-ng*
+/.idea
+*.log
