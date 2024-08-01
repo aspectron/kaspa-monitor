@@ -1,9 +1,9 @@
-var cacheName = 'kaspa-ng';
+var cacheName = 'kaspa-monitor';
 var filesToCache = [
   './',
   './index.html',
-  './kaspa-ng.js',
-  './kaspa-ng_bg.wasm',
+  './kaspa-monitor.js',
+  './kaspa-monitor_bg.wasm',
 ];
 
 /* Start the service worker and cache all of the app's content */

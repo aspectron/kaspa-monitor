@@ -15,7 +15,7 @@ impl Args {
 
         let cmd = Command::new("sparkled")
             .about(format!(
-                "sparkle node v{}-{}",
+                "kaspa cluster monitor v{}-{}",
                 crate::VERSION,
                 crate::GIT_DESCRIBE,
                 // kaspa_wallet_core::version()
@@ -33,7 +33,7 @@ impl Args {
                     .require_equals(true)
                     .value_parser(clap::value_parser!(ContextualNetAddress))
                     .help(
-                        "Interface:port to listen for wRPC connections (default: 127.0.0.1:7878).",
+                        "Interface:port to listen for wRPC connections (default: 127.0.0.1:6969).",
                     ),
             )
             .arg(
@@ -54,7 +54,7 @@ impl Args {
         let rpc_listen = matches
             .get_one::<ContextualNetAddress>("rpc-listen")
             .cloned()
-            .unwrap_or("127.0.0.1:6868".parse().unwrap());
+            .unwrap_or("127.0.0.1:6969".parse().unwrap());
 
         if matches.get_one::<bool>("version").cloned().unwrap_or(false) {
             println!("v{}-{}", crate::VERSION, crate::GIT_DESCRIBE);

@@ -132,3 +132,38 @@ impl Deserializer for Update {
         }
     }
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum Notification {
+    Update { update: Update },
+}
+
+impl Serializer for Notification {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        store!(u16, &1, writer)?;
+        match self {
+            Notification::Update { update } => {
+                store!(u8, &0, writer)?;
+                serialize!(Update, &update, writer)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Deserializer for Notification {
+    fn deserialize<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
+        let _version = load!(u16, reader)?;
+        let update_type = load!(u8, reader)?;
+        match update_type {
+            0 => {
+                let update = deserialize!(Update, reader)?;
+                Ok(Notification::Update { update })
+            }
+            _ => Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                "Invalid notification type",
+            )),
+        }
+    }
+}

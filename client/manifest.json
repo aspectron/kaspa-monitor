@@ -1,6 +1,6 @@
 {
-    "name": "KaspaNG",
-    "short_name": "kaspa-ng",
+    "name": "Kaspa Node Monitor",
+    "short_name": "kaspa-monitor",
     "icons": [
         {
             "src": "./icons/icon-256.png",

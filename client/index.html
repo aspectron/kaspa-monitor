@@ -16,9 +16,9 @@
     <!-- this is the base url relative to which other urls will be constructed. trunk will insert this from the public-url option -->
     <!-- <base data-trunk-public-url /> -->
 
-    <link data-trunk rel="copy-dir" href="../core/resources/icons" />
-    <link data-trunk rel="copy-file" href="../core/resources/images/kaspa-ng.svg" />
-    <link data-trunk rel="icon" href="../core/resources/icons/favicon.ico">
+    <!-- <link data-trunk rel="copy-dir" href="../core/resources/icons" /> -->
+    <!-- <link data-trunk rel="copy-file" href="../core/resources/images/kaspa-ng.svg" /> -->
+    <!-- <link data-trunk rel="icon" href="../core/resources/icons/favicon.ico"> -->
 
     <link data-trunk rel="copy-file" href="./pwa.js" />
     <link data-trunk rel="copy-file" href="./services.js" />
@@ -26,7 +26,7 @@
 
 
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon_ios_touch_192.png">
+    <!-- <link rel="apple-touch-icon" href="icons/icon_ios_touch_192.png"> -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="white">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#404040">
 
@@ -66,9 +66,10 @@
             margin-left: auto;
             display: block;
             position: absolute;
-            top: 0%;
-            left: 50%;
-            transform: translate(-50%, 0%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
         .centered {
@@ -157,7 +158,7 @@
 </head>
 
 <body>
-    <canvas id="kaspa-ng"></canvas>
+    <canvas id="kaspa-node-monitor"></canvas>
     <div class="centered" id="loading">
         <p style="font-size:16px">
             <img src="kaspa-ng.svg" alt="Kaspa NG" width="50%">

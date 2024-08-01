@@ -10,9 +10,7 @@ pub use workflow_rpc::client::{
     Resolver as RpcResolver, ResolverResult, WebSocketConfig, WebSocketError,
 };
 pub use workflow_rpc::encoding::Encoding as WrpcEncoding;
-
-#[derive(Debug, Clone, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
-pub struct Notification {}
+use workflow_serializer::prelude::Serializable;
 
 struct Inner {
     rpc_client: Arc<RpcClient<RpcApiOps>>,
@@ -27,11 +25,13 @@ struct Inner {
 }
 
 impl Inner {
-    pub fn try_new(url: &str, encoding: Encoding) -> Result<Inner> {
-        let wrpc_ctl_multiplexer = Multiplexer::<WrpcCtl>::new();
-        let options = RpcClientOptions::new()
-            .with_url(url)
-            .with_ctl_multiplexer(wrpc_ctl_multiplexer.clone());
+    pub fn try_new(url: Option<&str>, encoding: Encoding) -> Result<Inner> {
+        let ctl_multiplexer = Multiplexer::<WrpcCtl>::new();
+        let options = RpcClientOptions {
+            url,
+            ctl_multiplexer: Some(ctl_multiplexer.clone()),
+        };
+
         let notification_relay_channel = Channel::unbounded();
         let notification_intake_channel = Mutex::new(Channel::unbounded());
 
@@ -42,23 +42,28 @@ impl Inner {
             let notification_sender_ = notification_relay_channel.sender.clone();
             interface.notification(
                 notification_op,
-                workflow_rpc::client::Notification::new(move |notification: Notification| {
-                    let notification_sender = notification_sender_.clone();
-                    Box::pin(async move {
-                        // log_info!("notification receivers: {}", notification_sender.receiver_count());
-                        // log_trace!("notification {:?}", notification);
-                        if notification_sender.receiver_count() > 1 {
-                            // log_info!("notification: posting to channel: {notification:?}");
-                            notification_sender.send(notification).await?;
-                        } else {
-                            log_warn!(
-                                "WARNING: wRPC notification is not consumed by client: {:?}",
-                                notification
-                            );
-                        }
-                        Ok(())
-                    })
-                }),
+                workflow_rpc::client::Notification::new(
+                    move |notification: Serializable<Notification>| {
+                        // workflow_rpc::client::Notification::new(move |notification: Notification| {
+                        let notification_sender = notification_sender_.clone();
+                        Box::pin(async move {
+                            // println!("Receiving notification: {:?}", notification);
+
+                            // log_info!("notification receivers: {}", notification_sender.receiver_count());
+                            // log_trace!("notification {:?}", notification);
+                            if notification_sender.receiver_count() > 1 {
+                                // log_info!("notification: posting to channel: {notification:?}");
+                                notification_sender.send(notification.into_inner()).await?;
+                            } else {
+                                log_warn!(
+                                    "WARNING: wRPC notification is not consumed by client: {:?}",
+                                    notification.into_inner()
+                                );
+                            }
+                            Ok(())
+                        })
+                    },
+                ),
             );
         });
 
@@ -73,7 +78,7 @@ impl Inner {
             notification_relay_channel,
             notification_intake_channel,
             encoding,
-            wrpc_ctl_multiplexer,
+            wrpc_ctl_multiplexer: ctl_multiplexer,
             service_ctl: DuplexChannel::unbounded(),
             background_services_running: Arc::new(AtomicBool::new(false)),
             connect_guard: async_std::sync::Mutex::new(()),
@@ -93,11 +98,11 @@ impl Debug for Inner {
 }
 
 #[derive(Clone)]
-pub struct SparkleRpcClient {
+pub struct MonitorRpcClient {
     inner: Arc<Inner>,
 }
 
-impl Debug for SparkleRpcClient {
+impl Debug for MonitorRpcClient {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("SparkleRpcClient")
             .field("url", &self.url())
@@ -106,10 +111,16 @@ impl Debug for SparkleRpcClient {
     }
 }
 
-impl SparkleRpcClient {
-    pub fn try_new(url: &str, encoding: Option<Encoding>) -> Result<SparkleRpcClient> {
+impl Default for MonitorRpcClient {
+    fn default() -> Self {
+        Self::try_new(None, None).unwrap()
+    }
+}
+
+impl MonitorRpcClient {
+    pub fn try_new(url: Option<&str>, encoding: Option<Encoding>) -> Result<MonitorRpcClient> {
         let inner = Arc::new(Inner::try_new(url, encoding.unwrap_or(Encoding::Borsh))?);
-        let client = SparkleRpcClient { inner };
+        let client = MonitorRpcClient { inner };
         Ok(client)
     }
 
@@ -295,9 +306,18 @@ impl SparkleRpcClient {
         // }
         Ok(status)
     }
+
+    // pub fn notification_channel_receiver(&self) -> Receiver<Notification> {
+    //     self.inner
+    //         .notification_intake_channel
+    //         .lock()
+    //         .unwrap()
+    //         .receiver
+    //         .clone()
+    // }
 }
 
-impl SparkleRpcClient {
+impl MonitorRpcClient {
     build_wrpc_client_interface!(RpcApiOps, [Ping, GetStatus]);
 
     pub async fn ping(&self) -> Result<PingResponse> {

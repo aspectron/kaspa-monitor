@@ -1,7 +1,7 @@
 use super::Caps;
 use crate::imports::*;
 pub use kaspa_rpc_core::api::rpc::RpcApi;
-use kaspa_rpc_core::GetSystemInfoResponse;
+use kaspa_rpc_core::{GetBlockDagInfoResponse, GetSystemInfoResponse};
 pub use kaspa_wrpc_client::KaspaRpcClient;
 // reduce fd_limit by this amount to ensure the
 // system has enough file descriptors for other
@@ -115,7 +115,18 @@ impl rpc::ClientT for Client {
             previous_metrics_data.replace(current_metrics_data);
             metrics_snapshot
         };
-        let block_dag_info = self.client.get_block_dag_info().await?;
+        let GetBlockDagInfoResponse {
+            network: network_id,
+            block_count,
+            header_count,
+            tip_hashes,
+            difficulty,
+            past_median_time,
+            virtual_parent_hashes,
+            pruning_point_hash,
+            virtual_daa_score,
+            sink,
+        } = self.client.get_block_dag_info().await?;
 
         let sid = connection.sid();
         let uid = connection.uid();
@@ -125,8 +136,18 @@ impl rpc::ClientT for Client {
             sid,
             uid,
             is_synced,
-            block_dag_info,
+            // block_dag_info,
             metrics_snapshot,
+            network_id,
+            block_count,
+            header_count,
+            tip_hashes,
+            difficulty,
+            past_median_time,
+            virtual_parent_hashes,
+            pruning_point_hash,
+            virtual_daa_score,
+            sink,
         };
 
         Ok(kaspa_node_status.into())

@@ -5,56 +5,28 @@
     windows_subsystem = "windows"
 )]
 
-use cfg_if::cfg_if;
-// use kaspa_ng_core::app::{kaspa_ng_main, ApplicationContext};
-// use workflow_log::*;
+pub mod core;
+pub mod error;
+pub mod events;
+pub mod imports;
+pub mod modules;
+pub mod node;
+pub mod result;
+pub mod services;
 
-cfg_if! {
-    if #[cfg(not(target_arch = "wasm32"))] {
+use crate::imports::*;
 
-        fn main() {
+use workflow_egui as iris;
 
-            #[cfg(feature = "console")] {
-                std::env::set_var("RUST_BACKTRACE", "full");
-            }
+fn main() {
+    let options = iris::frame::options::Options::<Core>::new(
+        "Kaspa Node Monitor".to_string(),
+        "kaspa-node-monitor".to_string(),
+    );
 
-            let body = async {
-                todo!();
-                // if let Err(err) = kaspa_ng_main(ApplicationContext::default()).await {
-                //     log_error!("Error: {err}");
-                // }
-            };
+    iris::frame::main(options, None, |cc, runtime| {
+        log_info!("--- creating applcation ---");
 
-            #[allow(clippy::expect_used, clippy::diverging_sub_expression)]
-            //{
-                tokio::runtime::Builder::new_multi_thread()
-                    .enable_all()
-                    .build()
-                    .expect("Failed building the Runtime")
-                    .block_on(body);
-            //};
-
-            #[cfg(feature = "console")]
-            {
-                println!("Press Enter to exit...");
-                let mut input = String::new();
-                std::io::stdin().read_line(&mut input).expect("Failed to read line");
-            }
-
-
-        }
-
-    } else {
-
-        fn main() {
-
-            wasm_bindgen_futures::spawn_local(async {
-                todo!();
-                // if let Err(err) = kaspa_ng_main(ApplicationContext::default()).await {
-                //     log_error!("Error: {err}");
-                // }
-            });
-
-        }
-    }
+        Ok(Box::new(Core::try_new(cc, runtime)?))
+    });
 }

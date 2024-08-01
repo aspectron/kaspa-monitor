@@ -104,14 +104,17 @@ impl Nexus {
                                     // println!("Status: {status:?}");
                                     let update = Update::Status { status };
                                     for context in self.contexts() {
-                                        context.notify(update.clone()).await.ok();
+                                        // println!("Posting `Status` to context: {}", context.id());
+                                        context.notify(Notification::Update { update : update.clone() }).await.ok();
                                     }
                                 },
                                 Event::Caps { uid, caps } => {
                                     // println!("Caps: {uid} {caps:?}");
                                     let update = Update::Caps { uid, caps };
                                     for context in self.contexts() {
-                                        context.notify(update.clone()).await.ok();
+                                        // println!("Posting `Caps` to context: {}", context.id());
+                                        context.notify(Notification::Update { update : update.clone() }).await.ok();
+                                        // context.notify(update.clone()).await.ok();
                                     }
 
                                 },
@@ -182,12 +185,36 @@ impl Nexus {
         kaspa.into_iter().chain(sparkle).collect::<Vec<_>>()
     }
 
-    pub fn register_context(&self, context: Arc<dyn ContextT>) {
+    pub async fn register_context(&self, context: Arc<dyn ContextT>) {
+        println!("Registering context: {}", context.id());
+
+        let connections = self.connections();
+        let caps = connections
+            .iter()
+            .filter_map(|c| {
+                let caps = c.caps()?;
+                let uid = c.uid();
+                Some((uid, caps))
+            })
+            .collect::<Vec<_>>();
+
+        for (uid, caps) in caps {
+            let update = Update::Caps { uid, caps };
+            context
+                .notify(Notification::Update {
+                    update: update.clone(),
+                })
+                .await
+                .ok();
+        }
+
         let mut contexts = self.inner.contexts.write().unwrap();
         contexts.insert(context.id(), context.clone());
     }
 
-    pub fn unregister_context(&self, id: u64) {
+    pub async fn unregister_context(&self, id: u64) {
+        println!("Unregistering context: {}", id);
+
         let mut contexts = self.inner.contexts.write().unwrap();
         contexts.remove(&id);
     }

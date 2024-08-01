@@ -43,13 +43,15 @@ impl RpcHandler for Server {
             .map_err(|err| err.to_string())?
             .insert(id, connection.clone());
 
-        self.nexus().register_context(Arc::new(connection.clone()));
+        self.nexus()
+            .register_context(Arc::new(connection.clone()))
+            .await;
         Ok(connection)
     }
 
     async fn disconnect(self: Arc<Self>, connection: Self::Context, _result: WebSocketResult<()>) {
         self.inner.sockets.lock().unwrap().remove(&connection.id());
-        self.nexus().unregister_context(connection.id());
+        self.nexus().unregister_context(connection.id()).await;
     }
 }
 

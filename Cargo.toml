@@ -132,6 +132,7 @@ workflow-wasm = "0.15.0"
 workflow-rpc = "0.15.0"
 workflow-serializer = "0.15.0"
 workflow-encryption = "0.15.0"
+workflow-egui = { path = "../workflow-rs/egui" }
 
 # workflow-core = { path = "../workflow-rs/core" }
 # workflow-http = { path = "../workflow-rs/http" }
@@ -229,6 +230,17 @@ xxhash-rust = { version = "0.8.7", features = ["xxh3"] }
 # tokio = { version = "1", features = ["sync", "rt-multi-thread", "process"] }
 
 
+egui = "0.28.1"
+epaint = "=0.28.1"
+egui_plot = "=0.28.1"
+egui_extras = { version = "=0.28.1", features = ["svg","image"] }
+# eframe = "0.28.1"
+eframe = { version = "0.28.1", default-features = false, features = [
+#     # "accesskit",     # Make egui comptaible with screen readers. NOTE: adds a lot of dependencies.
+    "default_fonts", # Embed the default egui fonts.
+    "glow",          # Use the glow rendering backend. Alternative: "wgpu".
+    "persistence",   # Enable restoring app state when restarting the app.
+] }
 
 
 [profile.release]
