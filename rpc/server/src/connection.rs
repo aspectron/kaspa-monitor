@@ -10,6 +10,19 @@ struct ConnectionInner {
     pub messenger: Arc<Messenger>,
 }
 
+impl ConnectionInner {
+    // fn send(&self, message: Message) -> crate::result::Result<()> {
+    //     Ok(self.messenger.send_raw_message(message)?)
+    // }
+}
+
+// impl Notify<Notification> for ConnectionInner {
+//     fn notify(&self, notification: Notification) -> NotifyResult<()> {
+//         self.send(Connection::into_message(&notification, &self.messenger.encoding().into()))
+//             .map_err(|err| NotifyError::General(err.to_string()))
+//     }
+// }
+
 #[derive(Debug, Clone)]
 pub struct Connection {
     inner: Arc<ConnectionInner>,
@@ -83,8 +96,7 @@ impl ContextT for Connection {
             self.messenger().encoding(),
             RpcApiOps::Notify,
             Serializable(notification),
-        )
-        .unwrap();
+        )?;
         self.inner.messenger.send_raw_message(message)?;
         Ok(())
     }
