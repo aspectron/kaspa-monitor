@@ -69,10 +69,10 @@ impl Serializer for GetStatusResponse {
 impl Deserializer for GetStatusResponse {
     fn deserialize<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
         let _version = load!(u16, reader)?;
-        let sparkled_version = load!(String, reader)?;
+        let kaspa_monitor_version = load!(String, reader)?;
         // let network_id = load!(NetworkId, reader)?;
         Ok(Self {
-            kaspa_monitor_version: sparkled_version,
+            kaspa_monitor_version,
             // network_id,
         })
     }
